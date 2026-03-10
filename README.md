@@ -1,30 +1,68 @@
-# Football Analysis Project
+# AI-Powered Football Analysis System ⚽️🤖
 
-## Introduction
-The goal of this project is to detect and track players, referees, and footballs in a video using YOLO, one of the best AI object detection models available. We will also train the model to improve its performance. Additionally, we will assign players to teams based on the colors of their t-shirts using Kmeans for pixel segmentation and clustering. With this information, we can measure a team's ball acquisition percentage in a match. We will also use optical flow to measure camera movement between frames, enabling us to accurately measure a player's movement. Furthermore, we will implement perspective transformation to represent the scene's depth and perspective, allowing us to measure a player's movement in meters rather than pixels. Finally, we will calculate a player's speed and the distance covered. This project covers various concepts and addresses real-world problems, making it suitable for both beginners and experienced machine learning engineers.
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![YOLOv8](https://img.shields.io/badge/Model-YOLOv8-green)](https://github.com/ultralytics/ultralytics)
+[![OpenCV](https://img.shields.io/badge/Library-OpenCV-orange)](https://opencv.org/)
 
-![Screenshot](output_videos/screenshot.png)
+A comprehensive Computer Vision and Machine Learning pipeline designed to extract tactical insights from raw football match footage. This system automates player tracking, team identification, and spatial analytics to calculate real-world metrics like ball possession, player speed, and total distance covered.
 
-## Modules Used
-The following modules are used in this project:
-- YOLO: AI object detection model
-- Kmeans: Pixel segmentation and clustering to detect t-shirt color
-- Optical Flow: Measure camera movement
-- Perspective Transformation: Represent scene depth and perspective
-- Speed and distance calculation per player
 
-## Trained Models
-- [Trained Yolo v5](https://drive.google.com/file/d/1DC2kCygbBWUKheQ_9cFziCsYVSRw6axK/view?usp=sharing)
 
-## Sample video
--  [Sample input video](https://drive.google.com/file/d/1t6agoqggZKx6thamUuPAIdN_1zR9v9S_/view?usp=sharing)
+---
 
-## Requirements
-To run this project, you need to have the following requirements installed:
-- Python 3.x
-- ultralytics
-- supervision
-- OpenCV
-- NumPy
-- Matplotlib
-- Pandas
+## 📌 Project Overview
+The core challenge in sports analytics is converting 2D pixels into 3D spatial data. This project solves that by integrating multiple CV techniques:
+* **Object Detection:** Multi-class entity tracking (Players, Referees, Ball).
+* **Team Identification:** Color-based clustering for automated team assignment.
+* **Spatial Mapping:** Perspective transformation to map pixels to field coordinates.
+* **Motion Correction:** Optical flow to decouple camera movement from player movement.
+
+---
+
+## 🛠️ Technical Architecture & Features
+
+### 1. Multi-Entity Tracking (YOLOv8 & ByteTrack)
+* Utilized **YOLOv8** for high-performance object detection, fine-tuned to distinguish between players, referees, and the ball in varying lighting conditions.
+* Integrated **ByteTrack** and **Supervision** to maintain unique IDs for players even during high-occlusion events (e.g., player huddles or tackles).
+* **Ball Interpolation:** Implemented a **Pandas-based linear interpolation** logic to estimate ball position in frames where it is occluded by players or moving at high velocity.
+
+
+
+### 2. Team Assignment (K-Means Clustering)
+* Automated jersey color segmentation using **K-Means Clustering**.
+* The system crops player bounding boxes, segments the foreground (jersey) from the background (grass), and clusters RGB centroids to assign team IDs without manual labeling.
+
+### 3. Perspective Transformation (Homography)
+Standard broadcast angles distort the field view. I implemented a **Perspective Transform** to map the trapezoidal image view into a birds-eye-view rectangle.
+* **Mathematical Mapping:** Pixel coordinates are converted into real-world meter metrics.
+* **Result:** Provides accurate data for speed (km/h) and distance regardless of camera angle.
+
+
+
+### 4. Camera Motion Compensation
+* Calculated camera panning and zooming using **Optical Flow** features.
+* By isolating global camera movement, the system ensures that "Distance Covered" metrics are based solely on the player's physical exertion on the pitch, not the camera's movement.
+
+---
+
+## 📊 Analytics Output
+* **Team Possession:** Real-time calculation of ball acquisition percentage.
+* **Player Performance:** Per-player speed tracking (km/h) and total distance (meters) covered during the clip.
+* **Tactical Overlays:** Automated annotations including team circles, ball pointers, and speed labels.
+
+---
+
+## 💻 Tech Stack
+* **Core:** Python 3.x
+* **Vision:** OpenCV, Ultralytics (YOLOv8), Supervision
+* **Data:** NumPy, Pandas, Scikit-learn (K-Means)
+* **Development:** Google Colab (GPU training), Jupyter Notebooks
+
+---
+
+## 🚀 Installation & Usage
+
+1. **Clone the Repo:**
+   ```bash
+   git clone [https://github.com/Pratyush1110/Football_Analysis.git](https://github.com/Pratyush1110/Football_Analysis.git)
+   cd Football_Analysis
