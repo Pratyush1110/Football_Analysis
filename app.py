@@ -230,6 +230,102 @@ def _render_stats(stats: dict) -> None:
 
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
+    # ── Player lookup ────────────────────────────────────────────────────────
+    st.subheader("🔎 Player Lookup")
+    players_by_id = {int(pid): data for pid, data in players.items()}
+    player_ids = sorted(players_by_id.keys())
+    if player_ids:
+        player_id_text = st.text_input(
+            "Enter ByteTrack player ID",
+            placeholder="Example: 13",
+            help="Use the player ID assigned by ByteTrack in the analysis output.",
+            key="player_lookup_id",
+        ).strip()
+
+        st.caption(f"Available ByteTrack IDs: {', '.join(map(str, player_ids))}")
+
+        if player_id_text:
+            try:
+                selected_player_id = int(player_id_text)
+            except ValueError:
+                st.warning("Enter a numeric ByteTrack player ID.")
+                selected_player_id = None
+
+            if selected_player_id is not None:
+                selected_player = players_by_id.get(selected_player_id)
+                if selected_player is None:
+                    st.warning(
+                        f"Player ID {selected_player_id} was not found in the ByteTrack results."
+                    )
+                else:
+                    c1, c2, c3, c4 = st.columns(4)
+                    c1.metric("Player ID", selected_player["player_id"])
+                    c2.metric("Team", selected_player.get("team", "N/A"))
+                    c3.metric(
+                        "Distance (m)",
+                        f"{selected_player.get('total_distance_m', 0.0):.2f}",
+                    )
+                    c4.metric(
+                        "Avg Speed (km/h)",
+                        f"{selected_player.get('avg_speed_kmh', 0.0):.2f}",
+                    )
+
+                    c5, c6, c7, c8 = st.columns(4)
+                    c5.metric(
+                        "Max Speed (km/h)",
+                        f"{selected_player.get('max_speed_kmh', 0.0):.2f}",
+                    )
+                    c6.metric(
+                        "Tracked Frames", selected_player.get("tracked_frames", 0)
+                    )
+                    c7.metric(
+                        "Possession Frames",
+                        selected_player.get("possession_frames", 0),
+                    )
+                    c8.metric(
+                        "Possession %",
+                        f"{selected_player.get('possession_share_pct', 0.0):.2f}%",
+                    )
+
+                    st.dataframe(
+                        pd.DataFrame(
+                            [
+                                {
+                                    "Player ID": selected_player["player_id"],
+                                    "Team": selected_player.get("team", "?"),
+                                    "Distance (m)": selected_player.get(
+                                        "total_distance_m", 0.0
+                                    ),
+                                    "Avg Speed (km/h)": selected_player.get(
+                                        "avg_speed_kmh", 0.0
+                                    ),
+                                    "Max Speed (km/h)": selected_player.get(
+                                        "max_speed_kmh", 0.0
+                                    ),
+                                    "Possession Frames": selected_player.get(
+                                        "possession_frames", 0
+                                    ),
+                                    "Possession %": selected_player.get(
+                                        "possession_share_pct", 0.0
+                                    ),
+                                    "Tracked Frames": selected_player.get(
+                                        "tracked_frames", 0
+                                    ),
+                                }
+                            ]
+                        ),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+        else:
+            st.info(
+                "Enter an exact ByteTrack player ID above to view individual stats."
+            )
+    else:
+        st.info("No player-level stats are available for this analysis yet.")
+
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
     # ── Player stats ──────────────────────────────────────────────────────────
     st.subheader("👤 Player Statistics")
     player_rows = []
